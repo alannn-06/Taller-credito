@@ -39,3 +39,47 @@ function guardarTasa() {
         mostrarTexto("mensajeTasa", "La tasa debe estar entre 10% y 20%");
     }
 }
+
+function guardarCliente() {
+
+    let cedula = recuperaraTexto("txtCedula");
+    let nombre = recuperaraTexto("txtNombre");
+    let apellido = recuperaraTexto("txtApellido");
+    let ingresos = recuperarInt("txtIngresos");
+    let egresos = recuperarInt("txtEgresos");
+
+    let nuevoCliente = {
+        cedula: cedula,
+        nombre: nombre,
+        apellido: apellido,
+        ingresos: ingresos,
+        egresos: egresos
+    };
+
+  
+    clientes.push(nuevoCliente);
+
+    pintarClientes();
+}
+
+function pintarClientes() {
+    let tabla = document.getElementById("tablaClientes");
+    tabla.innerHTML = "";
+
+    clientes.forEach(function(cliente) {
+        let fila = `
+            <tr>
+                <td>${cliente.cedula}</td>
+                <td>${cliente.nombre}</td>
+                <td>${cliente.apellido}</td>
+                <td>${cliente.ingresos}</td>
+                <td>${cliente.egresos}</td>
+                <td>
+                    <button>Actualizar</button>
+                </td>
+            </tr>
+        `;
+      
+        tabla.innerHTML += fila;
+    });
+}
