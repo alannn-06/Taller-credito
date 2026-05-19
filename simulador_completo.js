@@ -124,3 +124,72 @@ function seleccionarCliente(cedula) {
         document.getElementById("txtCedula").disabled = true;
     }
 }
+
+function buscarClienteCredito() {
+    let cedulaBuscar = recuperaraTexto("buscarCedulaCredito");
+    let clienteEncontrado = buscarCliente(cedulaBuscar);
+    
+    let contenedorDatos = document.getElementById("datosClienteCredito");
+    
+    if (clienteEncontrado !== null) {
+        clienteSeleccionado = clienteEncontrado;
+
+        contenedorDatos.innerHTML = `
+            <h3>Datos del Cliente</h3>
+            <p><strong>Cédula:</strong> ${clienteSeleccionado.cedula}</p>
+            <p><strong>Nombre:</strong> ${clienteSeleccionado.nombre}</p>
+            <p><strong>Apellido:</strong> ${clienteSeleccionado.apellido}</p>
+            <p><strong>Ingresos:</strong> $${clienteSeleccionado.ingresos}</p>
+            <p><strong>Egresos:</strong> $${clienteSeleccionado.egresos}</p>
+        `;
+    } else {
+        clienteSeleccionado = null;
+        contenedorDatos.innerHTML = `<p class="error-mensaje">El cliente con cédula "${cedulaBuscar}" no fue encontrado.</p>`;
+    }
+}
+
+function calcularCredito() {
+    let divResultado = document.getElementById("resultadoCredito");
+    let btnSolicitar = document.getElementById("btnSolicitarCredito");
+
+    if (clienteSeleccionado === null) {
+        divResultado.innerHTML = "<p class='error-mensaje'>Debe buscar y seleccionar un cliente válido antes de calcular.</p>";
+        btnSolicitar.disabled = true;
+        return;
+    }
+
+    montoCalculado = recuperarFloat("montoCredito");
+    plazoCalculado = recuperarInt("plazoCredito");
+
+    if (isNaN(montoCalculado) || montoCalculado <= 0 || isNaN(plazoCalculado) || plazoCalculado <= 0) {
+        divResultado.innerHTML = "<p class='error-mensaje'>Por favor ingrese un monto y un plazo válidos.</p>";
+        btnSolicitar.disabled = true;
+        return;
+    }
+
+    let capacidadPago = clienteSeleccionado.ingresos - clienteSeleccionado.egresos;
+    let totalAPagar = montoCalculado + (montoCalculado * (tasaInteres / 100));
+    cuotaCalculada = totalAPagar / plazoCalculado;
+
+    if (cuotaCalculada <= capacidadPago) {
+        creditoAprobado = true;
+    } else {
+        creditoAprobado = false;
+    }
+
+    let mensajeResultado = `
+        Capacidad de pago: $${capacidadPago.toFixed(2)}<br>
+        Total a pagar: $${totalAPagar.toFixed(2)}<br>
+        Cuota mensual: $${cuotaCalculada.toFixed(2)}<br>
+        RESULTADO: ${creditoAprobado ? "APROBADO" : "RECHAZADO"}
+    `;
+    divResultado.innerHTML = mensajeResultado;
+
+    if (creditoAprobado) {
+        divResultado.className = "aprobado";
+        btnSolicitar.disabled = false; 
+    } else {
+        divResultado.className = "rechazado";
+        btnSolicitar.disabled = true;  
+    }
+}
