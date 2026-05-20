@@ -1,5 +1,4 @@
-
-  let clientes = [];
+let clientes = [];
   let creditos = [];
 
   let tasaInteres = 15;
@@ -93,6 +92,7 @@ function pintarClientes() {
                 <td>${cliente.egresos}</td>
                 <td>
                     <button onclick="seleccionarCliente('${cliente.cedula}')">Actualizar</button>
+                    <button onclick="eliminarCliente('${cliente.cedula}')">Eliminar</button>
                 </td>
             </tr>
         `;
@@ -191,5 +191,97 @@ function calcularCredito() {
     } else {
         divResultado.className = "rechazado";
         btnSolicitar.disabled = true;  
+    }
+}
+
+function pintarCreditos(arregloCreditos) {
+    let tabla = document.getElementById("tablaCreditos");
+    tabla.innerHTML = "";
+
+    arregloCreditos.forEach(function(credito, indice) {
+        let fila = `
+            <tr>
+                <td>${credito.cedula}</td>
+                <td>${credito.nombre}</td>
+                <td>${credito.apellido}</td>
+                <td>$${parseFloat(credito.monto).toFixed(2)}</td>
+                <td>${credito.tasa}%</td>
+                <td>${credito.plazo} meses</td>
+                <td>$${parseFloat(credito.cuota).toFixed(2)}</td>
+                <td>
+                    <button onclick="eliminarCredito(${indice})">Eliminar</button>
+                </td>
+            </tr>
+        `;
+        tabla.innerHTML += fila;
+    });
+}
+
+function eliminarCredito(indice) {
+    creditos.splice(indice, 1);
+    pintarCreditos(creditos);
+}
+
+function buscarCreditosCliente() {
+    let cedulaBuscar = recuperaraTexto("buscarCedulaListado");
+    let creditosFiltrados = [];
+
+    for (let i = 0; i < creditos.length; i++) {
+        if (creditos[i].cedula === cedulaBuscar) {
+            creditosFiltrados.push(creditos[i]);
+        }
+    }
+    pintarCreditos(creditosFiltrados);
+}
+
+function solicitarCredito() {
+    if (creditoAprobado === true && clienteSeleccionado !== null) {
+        let credito = {
+            cedula: clienteSeleccionado.cedula,
+            nombre: clienteSeleccionado.nombre,
+            apellido: clienteSeleccionado.apellido,
+            monto: montoCalculado,
+            tasa: tasaInteres,
+            plazo: plazoCalculado,
+            cuota: cuotaCalculada
+        };
+
+        creditos.push(credito);
+
+        let divResultado = document.getElementById("resultadoCredito");
+        divResultado.innerHTML += "<br><br><strong> Crédito asignado y registrado con exito</strong>";
+
+        document.getElementById("btnSolicitarCredito").disabled = true;
+        pintarCreditos(creditos);
+        
+    } else {
+        alert("No se puede asignar un credito que no ha sido previamente aprobado");
+    }
+}
+
+function eliminarCliente(cedula) {
+    let tieneCreditos = false;
+    for (let i = 0; i < creditos.length; i++) {
+        if (creditos[i].cedula === cedula) {
+            tieneCreditos = true;
+            break;
+        }
+    }
+    if (tieneCreditos) {
+        alert("No se puede eliminar el cliente porque tiene créditos asociados");
+        return; 
+    }
+
+    let posicion = -1;
+    for (let i = 0; i < clientes.length; i++) {
+        if (clientes[i].cedula === cedula) {
+            posicion = i; 
+            break;
+        }
+    }
+    if (posicion !== -1) {
+        clientes.splice(posicion, 1);
+        
+        pintarClientes();
     }
 }
