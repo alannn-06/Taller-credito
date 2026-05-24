@@ -15,6 +15,8 @@
   <button onclick="mostrarSeccion('parametros')">Parámetros</button>
   <button onclick="mostrarSeccion('clientes')">Clientes</button>
   <button onclick="mostrarSeccion('credito')">Créditos</button>
+  <button onclick="mostrarSeccion('seccionVIP')">Créditos VIP</button>
+  <button onclick="mostrarSeccion('seccionAcercaDe')">Acerca de</button>
 </nav>
 
 <section id="credito">
@@ -50,6 +52,13 @@
   <button onclick="guardarTasa()">Guardar tasa</button>
 
   <p id="mensajeTasa"></p>
+
+  <div>
+    <label for="txtMontoMaximo">Monto Máximo de Crédito:</label>
+    <input type="number" id="txtMontoMaximo" placeholder="Ej. 5000">
+    <button onclick="guardarMontoMaximo()">Guardar Monto Máximo</button>
+    <span id="mensajeMontoMax"></span>
+</div>
 </section>
 
 <section id="clientes">
@@ -60,13 +69,13 @@
   <input type="text" id="txtApellido" placeholder="Apellido">
   <input type="number" id="txtIngresos" placeholder="Ingresos">
   <input type="number" id="txtEgresos" placeholder="Egresos">
+  <input type="text" id="txtTelefono" placeholder="Teléfono">
 
   <br>
   <button onclick="guardarCliente()">Guardar cliente</button>
   <button onclick="limpiar()">Limpiar</button>
 
-  <button onclick="guardarCliente()">Guardar cliente</button>
-  <button>Limpiar</button>
+  
 
   <table>
     <thead>
@@ -76,12 +85,46 @@
         <th>Apellido</th>
         <th>Ingresos</th>
         <th>Egresos</th>
-        <th>Acciones</th>
+        <th>Telefono</th>
       </tr>
     </thead>
     <tbody id="tablaClientes"></tbody>
   </table>
 </section>
+
+<section id="seccionVIP">
+  <h2>Listado de Créditos VIP</h2>
+  <p>En esta sección se muestran únicamente los créditos aprobados con un monto superior a $5000.</p>
+  
+  <table id="tablaVIP">
+    <thead>
+      <tr>
+        <th>Cédula</th>
+        <th>Monto</th>
+        <th>Plazo (Meses)</th>
+        <th>Cuota Mensual</th>
+      </tr>
+    </thead>
+    <tbody id="cuerpoTablaVIP">
+      </tbody>
+  </table>
+</section>
+
+<section id="seccionAcercaDe">
+  <h2>Acerca del Desarrollador</h2>
+  
+  <div class="card card-acerca-de">
+    <img id="fotoDesarrollador" src="Foto.jpeg" alt="Foto del Desarrollador">
+    
+    <h3 class="autor-titulo">Desarrollador: Alan Chanatasig</h3>
+    <p class="autor-carrera">Carrera: Tecnología Superior en Desarrollo de Software</p>
+    
+    <p class="autor-frase">
+      "Simpatizante de la tecnología y la música"
+    </p>
+  </div>
+</section>
+
 
 
 

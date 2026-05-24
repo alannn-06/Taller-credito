@@ -125,3 +125,35 @@
     color: #dc3545;
     font-weight: bold;
 }
+
+.card-acerca-de {
+  text-align: center;
+  padding: 25px;
+}
+
+#fotoDesarrollador {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 3px solid #1f3c88;
+  margin-bottom: 15px;
+  border-radius: 50%; /* Esto hace que la foto se vea completamente redonda */
+}
+
+.autor-titulo {
+  margin: 10px 0;
+  color: #1f3c88;
+}
+
+.autor-carrera {
+  font-weight: bold;
+  color: #555;
+  margin: 5px 0;
+}
+
+.autor-frase {
+  font-style: italic;
+  color: #666;
+  margin: 15px auto;
+  max-width: 600px;
+}

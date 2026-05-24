@@ -1,4 +1,3 @@
-
   let clientes = [];
   let creditos = [];
 
@@ -8,6 +7,7 @@
   let montoCalculado = 0;
   let plazoCalculado = 0;
   let creditoAprobado = false;
+  let montoMaximoPermitido = 10000; 
 
   
 
@@ -25,6 +25,10 @@ function mostrarSeccion(id) {
     let seccionObjetivo = document.getElementById(id);
     if (seccionObjetivo) {
         seccionObjetivo.classList.add("activa");
+    }
+
+    if (id === "seccionVIP") {
+        pintarTablaVIP();
     }
 }
 
@@ -46,6 +50,8 @@ function guardarCliente() {
     let apellido = recuperaraTexto("txtApellido");
     let ingresos = recuperarInt("txtIngresos");
     let egresos = recuperarInt("txtEgresos");
+    let telefono = recuperaraTexto("txtTelefono"); 
+
     let clienteExistente = buscarCliente(cedula);
 
     if (clienteExistente === null) {
@@ -54,7 +60,8 @@ function guardarCliente() {
             nombre: nombre,
             apellido: apellido,
             ingresos: ingresos,
-            egresos: egresos
+            egresos: egresos,
+            telefono: telefono 
         };
         clientes.push(nuevoCliente);
     } else {
@@ -62,6 +69,7 @@ function guardarCliente() {
         clienteExistente.apellido = apellido;
         clienteExistente.ingresos = ingresos;
         clienteExistente.egresos = egresos;
+        clienteExistente.telefono = telefono; 
     }
     pintarClientes();
     limpiar();
@@ -73,6 +81,7 @@ function limpiar() {
     mostrarTextoEnCaja("txtApellido", "");
     mostrarTextoEnCaja("txtIngresos", "");
     mostrarTextoEnCaja("txtEgresos", "");
+    mostrarTextoEnCaja("txtTelefono", ""); 
     
     document.getElementById("txtCedula").disabled = false;
     
@@ -91,7 +100,7 @@ function pintarClientes() {
                 <td>${cliente.apellido}</td>
                 <td>${cliente.ingresos}</td>
                 <td>${cliente.egresos}</td>
-                <td>
+                <td>${cliente.telefono ? cliente.telefono : ""}</td> <td>
                     <button onclick="seleccionarCliente('${cliente.cedula}')">Actualizar</button>
                 </td>
             </tr>
@@ -120,6 +129,7 @@ function seleccionarCliente(cedula) {
         mostrarTextoEnCaja("txtApellido", clienteSeleccionado.apellido);
         mostrarTextoEnCaja("txtIngresos", clienteSeleccionado.ingresos);
         mostrarTextoEnCaja("txtEgresos", clienteSeleccionado.egresos);
+        mostrarTextoEnCaja("txtTelefono", clienteSeleccionado.telefono ? clienteSeleccionado.telefono : ""); 
         
         document.getElementById("txtCedula").disabled = true;
     }
@@ -141,6 +151,7 @@ function buscarClienteCredito() {
             <p><strong>Apellido:</strong> ${clienteSeleccionado.apellido}</p>
             <p><strong>Ingresos:</strong> $${clienteSeleccionado.ingresos}</p>
             <p><strong>Egresos:</strong> $${clienteSeleccionado.egresos}</p>
+            <p><strong>Teléfono:</strong> ${clienteSeleccionado.telefono ? clienteSeleccionado.telefono : "No registrado"}</p>
         `;
     } else {
         clienteSeleccionado = null;
@@ -164,6 +175,14 @@ function calcularCredito() {
     if (isNaN(montoCalculado) || montoCalculado <= 0 || isNaN(plazoCalculado) || plazoCalculado <= 0) {
         divResultado.innerHTML = "<p class='error-mensaje'>Por favor ingrese un monto y un plazo válidos.</p>";
         btnSolicitar.disabled = true;
+        return;
+    }
+
+    if (montoCalculado > montoMaximoPermitido) {
+        divResultado.innerHTML = `<p class='error-mensaje'>Error: El monto solicitado ($${montoCalculado.toFixed(2)}) supera el monto máximo permitido ($${montoMaximoPermitido.toFixed(2)}).</p>`;
+        divResultado.className = "rechazado";
+        btnSolicitar.disabled = true;
+        mostrarTextoEnCaja("montoCredito", "");
         return;
     }
 
@@ -192,4 +211,75 @@ function calcularCredito() {
         divResultado.className = "rechazado";
         btnSolicitar.disabled = true;  
     }
+}
+
+function solicitarCredito() {
+    if (clienteSeleccionado === null || !creditoAprobado) {
+        alert("No se puede solicitar: Debe seleccionar un cliente y el crédito debe estar APROBADO.");
+        return;
+    }
+    let nuevoCredito = {
+        cedula: clienteSeleccionado.cedula,
+        monto: montoCalculado,
+        plazo: plazoCalculado,
+        cuota: cuotaCalculada
+    };
+    creditos.push(nuevoCredito);
+    alert("Crédito solicitado con éxito para el cliente " + clienteSeleccionado.nombre + "");
+
+    document.getElementById("resultadoCredito").innerHTML = "";
+    document.getElementById("resultadoCredito").className = "";
+    mostrarTextoEnCaja("montoCredito", "");
+    mostrarTextoEnCaja("plazoCredito", "");
+    document.getElementById("btnSolicitarCredito").disabled = true;
+}
+
+function guardarMontoMaximo() {
+    let montoIngresado = recuperarFloat("txtMontoMaximo");
+    
+    if (!isNaN(montoIngresado) && montoIngresado > 0) {
+        montoMaximoPermitido = montoIngresado;
+        mostrarTexto("mensajeMontoMax", "Monto máximo configurado en: $" + montoMaximoPermitido.toFixed(2));
+    } else {
+        mostrarTexto("mensajeMontoMax", "Por favor, ingrese un monto válido mayor a 0.");
+    }
+}
+
+function registrarCreditoAprobado() {
+    if (clienteSeleccionado === null || !creditoAprobado) {
+        return;
+    }
+
+    let nuevoCredito = {
+        cedula: clienteSeleccionado.cedula,
+        monto: montoCalculado,
+        plazo: plazoCalculado,
+        cuota: cuotaCalculada
+    };
+
+    creditos.push(nuevoCredito);
+}
+
+function pintarTablaVIP() {
+    let tabla = document.getElementById("cuerpoTablaVIP");
+    tabla.innerHTML = ""; 
+    let creditosFiltrados = creditos.filter(function(credito) {
+        return credito.monto > 5000;
+    });
+    if (creditosFiltrados.length === 0) {
+        tabla.innerHTML = `<tr><td colspan="4">No hay créditos VIP registrados mayores a $5000</td></tr>`;
+        return;
+    }
+
+    creditosFiltrados.forEach(function(credito) {
+        let fila = `
+            <tr>
+                <td>${credito.cedula}</td>
+                <td>$${credito.monto.toFixed(2)}</td>
+                <td>${credito.plazo} meses</td>
+                <td>$${credito.cuota.toFixed(2)}</td>
+            </tr>
+        `;
+        tabla.innerHTML += fila;
+    });
 }
